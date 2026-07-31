@@ -300,6 +300,8 @@
             border-radius: 6px;
             cursor: pointer;
             transition: background 0.2s;
+            text-decoration: none;
+            display: inline-block;
         }
 
         .btn-download:hover {
@@ -438,9 +440,10 @@
                         <div class="download-box">
                             <div class="download-text">
                                 <h3>Veja o documento assinado e validado</h3>
-                                <p>Disponível até 07/08/2026</p>
+                                <p id="txt-disponivel">Disponível até 07/08/2026</p>
                             </div>
-                            <button class="btn-download">Download documento</button>
+                            <!-- Link com o atributo download -->
+                            <a id="download-link" href="OLIMPO_SN_4254148_9895_639044242187642076.pdf" download="Atestado_de_Matricula.pdf" class="btn-download">Download documento</a>
                         </div>
                     </div>
 
@@ -450,10 +453,10 @@
                             <div><strong>RAFAEL LEME</strong></div>
                             <div>Cargo: <strong>Secretário Acadêmico</strong></div>
                             <div>CPF: <strong>403.***.***-52</strong></div>
-                            <div>Assinou em: <strong>19/01/2026</strong></div>
+                            <div>Assinou em: <strong id="txt-assinou">19/01/2026</strong></div>
                             
                             <div class="validity-line">
-                                Válida até: <strong>07/08/2026</strong>
+                                Válida até: <strong id="txt-validade">07/08/2026</strong>
                             </div>
                         </div>
                     </div>
@@ -478,6 +481,9 @@
         const errorOrange = document.getElementById('error-orange');
         const errorRed = document.getElementById('error-red');
         const displayCode = document.getElementById('display-code');
+        const txtDisponivel = document.getElementById('txt-disponivel');
+        const txtValidade = document.getElementById('txt-validade');
+        const txtAssinou = document.getElementById('txt-assinou');
 
         function limparErros() {
             errorOrange.style.display = 'none';
@@ -505,18 +511,30 @@
                 return;
             }
 
+            // Altera as datas dinamicamente conforme o código digitado
+            if (inputElement.value === "1C28FEFE-2BD2-44E1-ACE1-573BE53B4F8D") {
+                txtDisponivel.textContent = "Disponível até 06/02/2027";
+                txtValidade.textContent = "06/02/2027";
+                txtAssinou.textContent = "21/07/2026";
+            } else {
+                txtDisponivel.textContent = "Disponível até 07/08/2026";
+                txtValidade.textContent = "07/08/2026";
+                txtAssinou.textContent = "19/01/2026";
+            }
+
             displayCode.textContent = inputElement.value;
             document.getElementById('page-search').classList.remove('active');
             document.getElementById('page-result').classList.add('active');
         }
 
-        // Permite pressionar Enter dentro do campo para disparar o botão
+        // Permite pressionar Enter dentro do campo para disparar a busca
         inputElement.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
                 realizarValidacao();
             }
         });
 
+        // Formatação dinâmica no padrão UUID (8-4-4-4-12)
         inputElement.addEventListener('input', (e) => {
             let raw = e.target.value.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
             
@@ -524,7 +542,6 @@
                 raw = raw.slice(0, 32);
             }
             
-            // Formatação no padrão UUID (8-4-4-4-12)
             let formatted = raw;
             if (raw.length > 20) {
                 formatted = `${raw.slice(0,8)}-${raw.slice(8,12)}-${raw.slice(12,16)}-${raw.slice(16,20)}-${raw.slice(20)}`;
