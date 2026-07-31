@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verificação de Documento</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background-color: #f8fafc;
+            color: #333333;
+        }
+
+        /* Topbar Principal */
+        .topbar {
+            background-color: #ffffff;
+            padding: 12px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-img {
+            height: 32px;
+            width: auto;
+            object-fit: contain;
+        }
+
+        .logo-text h1 {
+            font-size: 16px;
+            color: #1e293b;
+            font-weight: bold;
+        }
+
+        .logo-text p {
+            font-size: 11px;
+            color: #64748b;
+            margin-top: 2px;
+        }
+
+        .shield-img {
+            height: 24px;
+            width: auto;
+            object-fit: contain;
+        }
+
+        /* Barra de Logos das Marcas */
+        .brands-bar {
+            background-color: #ffffff;
+            padding: 12px 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 30px;
+            flex-wrap: wrap;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .brand-item-img {
+            height: 20px;
+            width: auto;
+            object-fit: contain;
+        }
+
+        /* Container Principal */
+        .container {
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        /* Lógica de Alternância de Páginas */
+        .page {
+            display: none;
+        }
+        
+        .page.active {
+            display: block;
+        }
+
+        /* ================= TELA DE BUSCA ================= */
+        .search-card {
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e2e8f0;
+            padding: 50px 40px;
+            text-align: center;
+        }
+
+        .search-card h2 {
+            font-size: 22px;
+            color: #1e293b;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .search-card p {
+            font-size: 14px;
+            color: #64748b;
+            margin-bottom: 35px;
+        }
+
+        .input-wrapper {
+            max-width: 550px;
+            margin: 0 auto 25px auto;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .input-container {
+            position: relative;
+            width: 100%;
+        }
+
+        .input-icon-left {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .key-svg {
+            width: 100%;
+            height: 100%;
+            fill: none;
+            stroke: #0056b3;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 14px 16px 14px 48px;
+            font-size: 14px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            color: #333333;
+            outline: none;
+            transition: border-color 0.15s ease-in-out;
+        }
+
+        .input-field:focus {
+            border-color: #0056b3;
+            box-shadow: 0 0 0 1px #0056b3;
+        }
+
+        /* Alertas de Erro */
+        .alert-message {
+            font-size: 13px;
+            font-weight: normal;
+            display: none;
+            text-align: left;
+            padding-left: 2px;
+        }
+
+        .alert-orange {
+            color: #c2410c;
+        }
+
+        .alert-red {
+            color: #dc2626;
+        }
+
+        .btn-search {
+            background-color: #0056b3;
+            color: white;
+            border: none;
+            padding: 14px 36px;
+            font-size: 14px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: background 0.2s;
+        }
+
+        .btn-search:hover {
+            background-color: #004494;
+        }
+
+        /* ================= TELA DE RESULTADO SUCESSO ================= */
+        .btn-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: #0056b3;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 14px;
+            margin-bottom: 25px;
+            cursor: pointer;
+        }
+
+        .main-card {
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e2e8f0;
+            overflow: hidden;
+        }
+
+        .status-header {
+            background-color: #f0fdf4;
+            padding: 20px 30px;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #15803d;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .status-svg {
+            width: 24px;
+            height: 24px;
+            fill: #16a34a;
+        }
+
+        .card-body {
+            padding: 30px;
+        }
+
+        .section-title {
+            color: #0056b3;
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .info-box {
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+
+        .info-line {
+            margin-bottom: 15px;
+            font-size: 14px;
+            color: #475569;
+        }
+
+        .info-line strong {
+            color: #0f172a;
+        }
+
+        .download-box {
+            background-color: #f8fafc;
+            border-radius: 6px;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        .download-text h3 {
+            font-size: 15px;
+            color: #1e293b;
+            margin-bottom: 4px;
+        }
+
+        .download-text p {
+            font-size: 12px;
+            color: #16a34a;
+            font-weight: 500;
+        }
+
+        .btn-download {
+            background-color: #0056b3;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 13px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-download:hover {
+            background-color: #004494;
+        }
+
+        .signature-grid {
+            display: grid;
+            grid-template-columns: 1.5fr 2fr 1.5fr 1.5fr;
+            gap: 15px;
+            font-size: 13px;
+            color: #475569;
+        }
+
+        .signature-grid div strong {
+            color: #0f172a;
+        }
+
+        .validity-line {
+            grid-column: span 4;
+            margin-top: 10px;
+            font-size: 13px;
+            color: #475569;
+        }
+
+        .legal-notice {
+            background-color: #f1f5f9;
+            border-radius: 6px;
+            padding: 15px 20px;
+            margin-top: 25px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 13px;
+            color: #475569;
+            line-height: 1.4;
+        }
+
+        .info-svg {
+            width: 20px;
+            height: 20px;
+            fill: #0056b3;
+            flex-shrink: 0;
+        }
+
+        @media (max-width: 768px) {
+            .signature-grid { grid-template-columns: 1fr; }
+            .validity-line { grid-column: span 1; }
+            .download-box { flex-direction: column; gap: 15px; text-align: center; }
+            .btn-download { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Topbar Principal -->
+    <div class="topbar">
+        <div class="logo-area">
+            <img class="logo-img" src="ico.png" alt="Ícone de verificação">
+            <div class="logo-text">
+                <h1>Verificação de documento</h1>
+                <p>Valide sua assinatura digital</p>
+            </div>
+        </div>
+        <div>
+            <img class="shield-img" src="lock.png" alt="Escudo de segurança">
+        </div>
+    </div>
+
+    <!-- Barra de Logos -->
+    <div class="brands-bar">
+        <img class="brand-item-img" src="Anhanguera.png" alt="Anhanguera">
+        <img class="brand-item-img" src="Unopar.png" alt="Unopar">
+        <img class="brand-item-img" src="Pitagoras.png" alt="Pitágoras">
+        <img class="brand-item-img" src="Unic.png" alt="Unic">
+        <img class="brand-item-img" src="Unime.png" alt="Unime">
+        <img class="brand-item-img" src="Uniderp.png" alt="Uniderp">
+        <img class="brand-item-img" src="Ampli.png" alt="Ampli">
+    </div>
+
+    <div class="container">
+
+        <!-- TELA 1: BUSCA PRINCIPAL -->
+        <div id="page-search" class="page active">
+            <div class="search-card">
+                <h2>Verifique seu documento</h2>
+                <p>Insira o código de validação do seu documento para validar a assinatura digital.</p>
+                
+                <div class="input-wrapper">
+                    <div class="input-container">
+                        <div class="input-icon-left">
+                            <svg class="key-svg" viewBox="0 0 24 24">
+                                <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3M15.5 7.5L19 4"/>
+                            </svg>
+                        </div>
+                        <input type="text" id="doc-code" class="input-field" placeholder="Digite aqui o código de validação do documento">
+                    </div>
+                    
+                    <!-- Textos de erro -->
+                    <div id="error-orange" class="alert-message alert-orange">
+                        Você inseriu menos de 32 dígitos, verifique o código e o insira corretamente.
+                    </div>
+                    <div id="error-red" class="alert-message alert-red">
+                        Documento não encontrado, verifique se digitou o código corretamente.
+                    </div>
+                </div>
+
+                <button class="btn-search" onclick="realizarValidacao()">
+                    Verificar ➔
+                </button>
+            </div>
+        </div>
+
+        <!-- TELA 2: EXIBIÇÃO DE RESULTADO -->
+        <div id="page-result" class="page">
+            <div class="btn-back" onclick="voltarParaBusca()">
+                ◀ Verificar novo documento
+            </div>
+
+            <div class="main-card">
+                <div class="status-header">
+                    <svg class="status-svg" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                    Documento e assinatura digital válida
+                </div>
+
+                <div class="card-body">
+                    <div class="section-title">Detalhes do documento</div>
+                    <div class="info-box">
+                        <div class="info-line">
+                            Identificação do documento: <strong>Atestado de Matrícula</strong>
+                        </div>
+                        <div class="info-line">
+                            Código de validação do documento: <strong id="display-code">1C28FEFE-2BD2-44E1-ACE1-573BE53B4F8D</strong>
+                        </div>
+
+                        <div class="download-box">
+                            <div class="download-text">
+                                <h3>Veja o documento assinado e validado</h3>
+                                <p>Disponível até 07/08/2026</p>
+                            </div>
+                            <button class="btn-download">Download documento</button>
+                        </div>
+                    </div>
+
+                    <div class="section-title">Assinaturas</div>
+                    <div class="info-box">
+                        <div class="signature-grid">
+                            <div><strong>RAFAEL LEME</strong></div>
+                            <div>Cargo: <strong>Secretário Acadêmico</strong></div>
+                            <div>CPF: <strong>403.***.***-52</strong></div>
+                            <div>Assinou em: <strong>19/01/2026</strong></div>
+                            
+                            <div class="validity-line">
+                                Válida até: <strong>07/08/2026</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="legal-notice">
+                        <svg class="info-svg" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+                        <span>Assinatura digital e eletrônica têm validade jurídica prevista pelo artigo 10 da Medida Provisória nº 2.200/2001.</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const CODIGOS_CORRETOS = [
+            "07DB9679-8D3F-49E5-9D3D-F2DC23425817",
+            "1C28FEFE-2BD2-44E1-ACE1-573BE53B4F8D"
+        ];
+        
+        const inputElement = document.getElementById('doc-code');
+        const errorOrange = document.getElementById('error-orange');
+        const errorRed = document.getElementById('error-red');
+        const displayCode = document.getElementById('display-code');
+
+        function limparErros() {
+            errorOrange.style.display = 'none';
+            errorRed.style.display = 'none';
+        }
+
+        function voltarParaBusca() {
+            document.getElementById('page-result').classList.remove('active');
+            document.getElementById('page-search').classList.add('active');
+            inputElement.value = "";
+            limparErros();
+        }
+
+        function realizarValidacao() {
+            const textoLimpo = inputElement.value.replace(/[^a-zA-Z0-9]/g, '');
+            limparErros();
+
+            if (textoLimpo.length < 32) {
+                errorOrange.style.display = 'block';
+                return;
+            }
+
+            if (!CODIGOS_CORRETOS.includes(inputElement.value)) {
+                errorRed.style.display = 'block';
+                return;
+            }
+
+            displayCode.textContent = inputElement.value;
+            document.getElementById('page-search').classList.remove('active');
+            document.getElementById('page-result').classList.add('active');
+        }
+
+        // Permite pressionar Enter dentro do campo para disparar o botão
+        inputElement.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                realizarValidacao();
+            }
+        });
+
+        inputElement.addEventListener('input', (e) => {
+            let raw = e.target.value.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+            
+            if (raw.length > 32) {
+                raw = raw.slice(0, 32);
+            }
+            
+            // Formatação no padrão UUID (8-4-4-4-12)
+            let formatted = raw;
+            if (raw.length > 20) {
+                formatted = `${raw.slice(0,8)}-${raw.slice(8,12)}-${raw.slice(12,16)}-${raw.slice(16,20)}-${raw.slice(20)}`;
+            } else if (raw.length > 16) {
+                formatted = `${raw.slice(0,8)}-${raw.slice(8,12)}-${raw.slice(12,16)}-${raw.slice(16)}`;
+            } else if (raw.length > 12) {
+                formatted = `${raw.slice(0,8)}-${raw.slice(8,12)}-${raw.slice(12)}`;
+            } else if (raw.length > 8) {
+                formatted = `${raw.slice(0,8)}-${raw.slice(8)}`;
+            }
+            
+            e.target.value = formatted;
+            limparErros();
+        });
+    </script>
+</body>
+</html>
